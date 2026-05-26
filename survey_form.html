@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Survey Form</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Header -->
+  <header>
+    <div class="header-accent"></div>
+    <div>
+      <h1>Survey <span>Form</span></h1>
+      <p>Fill in your details below. All entries appear as cards.</p>
+    </div>
+  </header>
+
+  <!-- Form -->
+  <div class="form-card">
+    <div class="form-grid">
+
+      <div class="field">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" placeholder="e.g. Anjali Menon"/>
+      </div>
+
+      <div class="field">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" placeholder="e.g. anjali@email.com"/>
+      </div>
+
+      <div class="field">
+        <label for="phone">Phone Number</label>
+        <input type="tel" id="phone" placeholder="e.g. +91 98765 43210"/>
+      </div>
+
+      <div class="field full">
+        <label for="message">Message</label>
+        <textarea id="message" placeholder="Write your message here…"></textarea>
+      </div>
+
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-submit" onclick="submitEntry()">Submit Entry</button>
+      <button class="btn-reset" onclick="resetForm()">Clear</button>
+    </div>
+  </div>
+
+  <!-- Entries Section -->
+  <div class="section-label">
+    <h2>Submitted Entries</h2>
+    <span class="badge" id="count-badge">0</span>
+    <button class="clear-all-btn" id="clear-all-btn" onclick="clearAll()">🗑 Clear All</button>
+  </div>
+
+  <div id="empty-state" class="empty-state">
+    <div class="icon">📋</div>
+    <p>No entries yet. Submit the form to see entries here.</p>
+  </div>
+
+  <div id="entries-list"></div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">✓ Entry submitted!</div>
+
+<script>
+  let entries = [];
+  let counter = 0;
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  function submitEntry() {
+    const name    = document.getElementById('name').value.trim();
+    const email   = document.getElementById('email').value.trim();
+    const phone   = document.getElementById('phone').value.trim();
+    const message = document.getElementById('message').value.trim();
+
+    if (!name || !email || !phone || !message) {
+      showToast('⚠️ Please fill in all fields.');
+      return;
+    }
+
+    counter++;
+    const entry = { id: counter, name, email, phone, message };
+    entries.unshift(entry);
+    renderEntries();
+    resetForm();
+    showToast('✓ Entry submitted!');
+  }
+
+  function resetForm() {
+    ['name','email','phone','message'].forEach(id => document.getElementById(id).value = '');
+  }
+
+  function deleteEntry(id) {
+    entries = entries.filter(e => e.id !== id);
+    renderEntries();
+  }
+
+  function clearAll() {
+    if (confirm('Remove all entries?')) {
+      entries = [];
+      renderEntries();
+    }
+  }
+
+  function renderEntries() {
+    const list     = document.getElementById('entries-list');
+    const empty    = document.getElementById('empty-state');
+    const badge    = document.getElementById('count-badge');
+    const clearBtn = document.getElementById('clear-all-btn');
+
+    badge.textContent = entries.length;
+
+    if (entries.length === 0) {
+      empty.style.display = 'block';
+      list.innerHTML = '';
+      clearBtn.classList.remove('visible');
+      return;
+    }
+
+    empty.style.display = 'none';
+    clearBtn.classList.add('visible');
+
+    list.innerHTML = entries.map((e) => `
+      <div class="entry-card">
+        <div class="entry-header">
+          <div class="entry-name">${escHtml(e.name)}</div>
+          <span class="entry-num">#${e.id}</span>
+        </div>
+        <div class="entry-meta">
+          <div class="meta-item">
+            <span class="icon">✉️</span>
+            <span>${escHtml(e.email)}</span>
+          </div>
+          <div class="meta-item">
+            <span class="icon">📞</span>
+            <span>${escHtml(e.phone)}</span>
+          </div>
+        </div>
+        <div class="entry-message">${escHtml(e.message)}</div>
+        <button class="delete-btn" onclick="deleteEntry(${e.id})" title="Delete">✕</button>
+      </div>
+    `).join('');
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+</script>
+</body>
+</html>

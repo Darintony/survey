@@ -1,17 +1,20 @@
+/* ── Reset & Variables ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #0d0d0d;
-  --surface: #161616;
-  --card: #1e1e1e;
-  --border: #2e2e2e;
-  --accent: #c8f06e;
+  --bg:         #0d0d0d;
+  --surface:    #161616;
+  --card:       #1e1e1e;
+  --border:     #2e2e2e;
+  --accent:     #c8f06e;
   --accent-dim: #a3c855;
-  --text: #f0f0f0;
-  --muted: #888;
-  --danger: #ff6b6b;
+  --text:       #f0f0f0;
+  --muted:      #888;
+  --danger:     #ff6b6b;
+  --warning:    #ffb347;
 }
 
+/* ── Base ── */
 body {
   background: var(--bg);
   color: var(--text);
@@ -20,7 +23,6 @@ body {
   padding: 40px 20px 80px;
 }
 
-/* Grain overlay */
 body::before {
   content: '';
   position: fixed;
@@ -29,6 +31,41 @@ body::before {
   pointer-events: none;
   z-index: 0;
   opacity: 0.4;
+}
+
+/* ── Toast — top-left ── */
+.toast {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  background: var(--accent);
+  color: #0d0d0d;
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  opacity: 0;
+  transform: translateY(-16px);
+  transition: opacity 0.3s, transform 0.3s;
+  pointer-events: none;
+  z-index: 999;
+  max-width: 320px;
+  line-height: 1.4;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast.error {
+  background: var(--danger);
+  color: #fff;
+}
+
+.toast.warning {
+  background: var(--warning);
+  color: #0d0d0d;
 }
 
 /* ── Container ── */
@@ -63,9 +100,7 @@ header h1 {
   letter-spacing: -0.03em;
 }
 
-header h1 span {
-  color: var(--accent);
-}
+header h1 span { color: var(--accent); }
 
 header p {
   color: var(--muted);
@@ -102,10 +137,11 @@ header p {
   gap: 24px;
 }
 
+/* ── Fields ── */
 .field {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .field.full { grid-column: 1 / -1; }
@@ -116,7 +152,22 @@ label {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
+
+.word-counter {
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  text-transform: none;
+  font-weight: 400;
+  transition: color 0.2s;
+}
+
+.word-counter.near-limit  { color: var(--warning); }
+.word-counter.at-limit    { color: var(--danger); }
 
 input, textarea {
   background: var(--surface);
@@ -136,9 +187,22 @@ input:focus, textarea:focus {
   box-shadow: 0 0 0 3px rgba(200,240,110,0.1);
 }
 
+input.invalid, textarea.invalid {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(255,107,107,0.1);
+}
+
 textarea {
   resize: vertical;
   min-height: 110px;
+}
+
+/* Error messages */
+.error-msg {
+  font-size: 0.76rem;
+  color: var(--danger);
+  min-height: 16px;
+  display: block;
 }
 
 /* ── Buttons ── */
@@ -163,11 +227,7 @@ textarea {
   transition: background 0.2s, transform 0.15s;
 }
 
-.btn-submit:hover {
-  background: var(--accent-dim);
-  transform: translateY(-1px);
-}
-
+.btn-submit:hover  { background: var(--accent-dim); transform: translateY(-1px); }
 .btn-submit:active { transform: translateY(0); }
 
 .btn-reset {
@@ -183,26 +243,6 @@ textarea {
 }
 
 .btn-reset:hover { color: var(--text); border-color: #555; }
-
-/* ── Toast ── */
-.toast {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  background: var(--accent);
-  color: #0d0d0d;
-  padding: 12px 22px;
-  border-radius: 10px;
-  font-weight: 500;
-  font-size: 0.9rem;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.3s, transform 0.3s;
-  pointer-events: none;
-  z-index: 100;
-}
-
-.toast.show { opacity: 1; transform: translateY(0); }
 
 /* ── Entries Section ── */
 .section-label {
@@ -296,7 +336,6 @@ textarea {
   color: var(--muted);
 }
 
-.meta-item .icon { font-size: 0.8rem; }
 .meta-item span { color: var(--text); }
 
 .entry-message {
@@ -307,7 +346,10 @@ textarea {
   font-size: 0.88rem;
   color: #ccc;
   line-height: 1.6;
+  word-break: break-word;
 }
+
+.entry-message .truncated { color: var(--muted); font-style: italic; }
 
 .delete-btn {
   position: absolute;
@@ -340,12 +382,84 @@ textarea {
   display: none;
 }
 
-.clear-all-btn:hover { background: rgba(255,107,107,0.1); }
+.clear-all-btn:hover  { background: rgba(255,107,107,0.1); }
 .clear-all-btn.visible { display: inline-block; }
+
+/* ── Email simulation modal ── */
+.email-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.email-modal {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px 40px;
+  max-width: 480px;
+  width: 90%;
+  position: relative;
+  animation: popIn 0.25s ease;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.92); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.email-modal .modal-icon { font-size: 2.4rem; margin-bottom: 14px; }
+.email-modal h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+}
+
+.email-modal .to-line {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.email-modal .to-line span { color: var(--accent); }
+
+.email-modal .email-body {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: #ddd;
+  margin-bottom: 24px;
+}
+
+.email-modal .btn-close-modal {
+  background: var(--accent);
+  color: #0d0d0d;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 30px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.email-modal .btn-close-modal:hover { background: var(--accent-dim); }
 
 /* ── Responsive ── */
 @media (max-width: 600px) {
-  .form-grid { grid-template-columns: 1fr; }
-  .form-card { padding: 24px; }
+  .form-grid  { grid-template-columns: 1fr; }
+  .form-card  { padding: 24px; }
   .entry-card { padding: 18px 20px; }
+  .email-modal { padding: 28px 24px; }
 }

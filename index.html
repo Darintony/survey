@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Survey Form</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <!-- Toast Notification (top-left) -->
+  <div class="toast" id="toast"></div>
+
+  <div class="container">
+
+    <!-- Header -->
+    <header>
+      <div class="header-accent"></div>
+      <div>
+        <h1>Survey <span>Form</span></h1>
+        <p>Fill in your details below. All entries appear as cards.</p>
+      </div>
+    </header>
+
+    <!-- Form -->
+    <div class="form-card">
+      <div class="form-grid">
+
+        <div class="field">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" placeholder="e.g. Anjali Menon"/>
+          <span class="error-msg" id="err-name"></span>
+        </div>
+
+        <div class="field">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="e.g. anjali@email.com"/>
+          <span class="error-msg" id="err-email"></span>
+        </div>
+
+        <div class="field">
+          <label for="phone">Phone Number</label>
+          <input type="tel" id="phone" placeholder="10-digit number" maxlength="10"/>
+          <span class="error-msg" id="err-phone"></span>
+        </div>
+
+        <div class="field full">
+          <label for="message">
+            Message
+            <span class="word-counter" id="word-counter">0 / 200 words</span>
+          </label>
+          <textarea id="message" placeholder="Write your message here… (max 200 words)"></textarea>
+          <span class="error-msg" id="err-message"></span>
+        </div>
+
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-submit" id="btn-submit">Submit Entry</button>
+        <button class="btn-reset" id="btn-reset">Clear</button>
+      </div>
+    </div>
+
+    <!-- Entries Section -->
+    <div class="section-label">
+      <h2>Submitted Entries</h2>
+      <span class="badge" id="count-badge">0</span>
+      <button class="clear-all-btn" id="clear-all-btn">🗑 Clear All</button>
+    </div>
+
+    <div id="empty-state" class="empty-state">
+      <div class="icon">📋</div>
+      <p>No entries yet. Submit the form to see entries here.</p>
+    </div>
+
+    <div id="entries-list"></div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
